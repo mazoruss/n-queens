@@ -72,14 +72,14 @@ window.countNQueensSolutions = function(n) {
       } 
     } else {
       pL.forEach(t => {
-      // store that tuple somewhere
-        // console.log('tuple', t);
-        currentSolution.push(t);
-        // console.log('currentsol', currentSolution.toString());
-        // make new possibilites array without that tuple and all its bad associates
-        var nextPossibilities = removeBadTuples(pL, t[0], t[1]);
-        recursePossibilities(nextPossibilities, currentSolution);
-        currentSolution.pop();
+        if (t[0] === currentSolution.length) {
+          // store that tuple somewhere
+          currentSolution.push(t);
+          // make new possibilites array without that tuple and all its bad associates
+          var nextPossibilities = removeBadTuples(pL, t[0], t[1]);
+          recursePossibilities(nextPossibilities, currentSolution);
+          currentSolution.pop();
+        }
       });
     }
   };
