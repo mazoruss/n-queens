@@ -32,12 +32,110 @@ window.findNRooksSolution = function(n) {
 
 // return the number of nxn chessboards that exist, with n rooks placed such that none of them can attack each other
 window.countNRooksSolutions = function(n) {
-  return true;
+  var possibilities = [];
+  var solutions = [];
+  for (var x = 0; x < n; x++) {
+    for (var y = 0; y < n; y++) {
+      possibilities.push([x, y]);
+    }
+  }
+  
+  var removeBadTuples = function(array, x, y) {
+    return array.filter(function(tuple) {
+      if (tuple[0] === x || tuple[1] === y) {
+        return false;
+      } return true;
+    });
+  };
+
+  var recursePossibilities = function(pL, currentSolution) {
+    var currentSolution = currentSolution || [];
+    if (pL.length === 0) {
+      // push current possibility tree to array of solutions
+      if (currentSolution.length === n) {
+        // console.log(currentSolution);
+        solutions.push(currentSolution.slice());
+        // console.log(currentSolution.toString());
+      } 
+    } else {
+      pL.forEach(t => {
+        if (t[0] === currentSolution.length) {
+          // store that tuple somewhere
+          currentSolution.push(t);
+          // make new possibilites array without that tuple and all its bad associates
+          var nextPossibilities = removeBadTuples(pL, t[0], t[1]);
+          recursePossibilities(nextPossibilities, currentSolution);
+          currentSolution.pop();
+        }
+      });
+    }
+  };
+
+  recursePossibilities(possibilities);
+
+  return _.uniq(solutions.map( answers => answers.map( tuple => 
+    (tuple[0] * n + tuple[1])).sort().toString()
+  )).length;
 };
 
 // return a matrix (an array of arrays) representing a single nxn chessboard, with n queens placed such that none of them can attack each other
 window.findNQueensSolution = function(n) {
-  return true;
+  var possibilities = [];
+  var solutions = [];
+  for (var x = 0; x < n; x++) {
+    for (var y = 0; y < n; y++) {
+      possibilities.push([x, y]);
+    }
+  }
+
+  var removeBadTuples = function(array, x, y) {
+    return array.filter(function(tuple) {
+      if (tuple[0] === x ||
+          tuple[1] === y ||
+          Math.abs(tuple[0] - x) === Math.abs(tuple[1] - y)
+        ) {
+        return false;
+      } return true;
+    });
+  };
+
+  var recursePossibilities = function(pL, currentSolution) {
+    var currentSolution = currentSolution || [];
+    if (pL.length === 0) {
+      // push current possibility tree to array of solutions
+      if (currentSolution.length === n) {
+        // console.log(currentSolution);
+        solutions.push(currentSolution.slice());
+        // console.log(currentSolution.toString());
+      } 
+    } else {
+      pL.forEach(t => {
+        if (t[0] === currentSolution.length) {
+          // store that tuple somewhere
+          currentSolution.push(t);
+          // make new possibilites array without that tuple and all its bad associates
+          var nextPossibilities = removeBadTuples(pL, t[0], t[1]);
+          recursePossibilities(nextPossibilities, currentSolution);
+          currentSolution.pop();
+        }
+      });
+    }
+  };
+
+  recursePossibilities(possibilities);
+
+
+  var solution = solutions[0];
+  var board = new Board({'n': n});
+  console.log('sol', solution, n);
+  if (solutions.length === 0) {
+    return board.rows();
+  }
+
+  solution.forEach(tuple => {
+    board.togglePiece(tuple[0], tuple[1]);
+  });
+  return board.rows();
 };
 
 // return the number of nxn chessboards that exist, with n queens placed such that none of them can attack each other
@@ -86,13 +184,7 @@ window.countNQueensSolutions = function(n) {
 
   recursePossibilities(possibilities);
 
-  solutions.map( answers => answers.map( tuple => 
-    (tuple[0] * n + tuple[1]))
-    );
-  solutions = solutions.map( answers => answers.map( tuple => 
+  return _.uniq(solutions.map( answers => answers.map( tuple => 
     (tuple[0] * n + tuple[1])).sort().toString()
-    );
-  var result = _.uniq(solutions);
-
-  return result.length;
+  )).length;
 };
