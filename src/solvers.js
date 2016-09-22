@@ -16,7 +16,6 @@
 
 
 window.findNRooksSolution = function(n) {
-  var solution = undefined;
   var board = new Board({'n': n});
 
   for (var x = 0; x < n; x++) {
@@ -33,24 +32,67 @@ window.findNRooksSolution = function(n) {
 
 // return the number of nxn chessboards that exist, with n rooks placed such that none of them can attack each other
 window.countNRooksSolutions = function(n) {
-  var solutionCount = undefined; //fixme
-
-  // console.log('Number of solutions for ' + n + ' rooks:', solutionCount);
-  return solutionCount;
+  return true;
 };
 
 // return a matrix (an array of arrays) representing a single nxn chessboard, with n queens placed such that none of them can attack each other
 window.findNQueensSolution = function(n) {
-  var solution = undefined; //fixme
-
-  // console.log('Single solution for ' + n + ' queens:', JSON.stringify(solution));
-  return solution;
+  return true;
 };
 
 // return the number of nxn chessboards that exist, with n queens placed such that none of them can attack each other
 window.countNQueensSolutions = function(n) {
-  var solutionCount = undefined; //fixme
+  var possibilities = [];
+  var solutions = [];
+  for (var x = 0; x < n; x++) {
+    for (var y = 0; y < n; y++) {
+      possibilities.push([x, y]);
+    }
+  }
+  
+  var removeBadTuples = function(array, x, y) {
+    return array.filter(function(tuple) {
+      if (tuple[0] === x ||
+          tuple[1] === y ||
+          Math.abs(tuple[0] - x) === Math.abs(tuple[1] - y)
+        ) {
+        return false;
+      } return true;
+    });
+  };
 
-  // console.log('Number of solutions for ' + n + ' queens:', solutionCount);
-  return solutionCount;
+  var recursePossibilities = function(pL, currentSolution) {
+    var currentSolution = currentSolution || [];
+    if (pL.length === 0) {
+      // push current possibility tree to array of solutions
+      if (currentSolution.length === n) {
+        // console.log(currentSolution);
+        solutions.push(currentSolution.slice());
+        // console.log(currentSolution.toString());
+      } 
+    } else {
+      pL.forEach(t => {
+      // store that tuple somewhere
+        // console.log('tuple', t);
+        currentSolution.push(t);
+        // console.log('currentsol', currentSolution.toString());
+        // make new possibilites array without that tuple and all its bad associates
+        var nextPossibilities = removeBadTuples(pL, t[0], t[1]);
+        recursePossibilities(nextPossibilities, currentSolution);
+        currentSolution.pop();
+      });
+    }
+  };
+
+  recursePossibilities(possibilities);
+
+  solutions.map( answers => answers.map( tuple => 
+    (tuple[0] * n + tuple[1]))
+    );
+  solutions = solutions.map( answers => answers.map( tuple => 
+    (tuple[0] * n + tuple[1])).sort().toString()
+    );
+  var result = _.uniq(solutions);
+
+  return result.length;
 };
